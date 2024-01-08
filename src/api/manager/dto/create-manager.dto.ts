@@ -1,11 +1,12 @@
-import { Types } from 'mongoose';
+import { Schema } from 'mongoose';
 
 export class CreateManagerDto {
   constructor(
     public name: number,
     public user_name: string,
-    public password: Types.ObjectId,
+    public password: string,
     public phone: string,
-    public branch_id: Types.ObjectId,
+    public email: string,
+    public association: Schema.Types.ObjectId,
   ) {}
 }

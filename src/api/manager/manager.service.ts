@@ -10,32 +10,33 @@ export class ManagerService {
   constructor(@InjectModel('Manager') private managerModel: Model<Manager>) {}
 
   async create(createManagerDto: CreateManagerDto) {
-    const newManager = new this.managerModel({
-      name: createManagerDto.name,
-      user_name: createManagerDto.user_name,
-      password: createManagerDto.password,
-      phone: createManagerDto.phone,
-      branch_id: createManagerDto.branch_id,
-    });
-    const manager = await newManager.save();
+    const newManager = new this.managerModel(createManagerDto);
+    let manager: any;
+    try {
+      manager = await newManager.save();
+    } catch (error) {
+      throw new NotFoundException('Email is exist!');
+    }
     return {
-      manager_id: manager.id,
       name: manager.name,
-      user_name: manager.user_name,
       password: manager.password,
+      email: manager.email,
       phone: manager.phone,
-      branch_id: manager.branch_id,
+      association: manager.association,
     };
   }
 
   async findAll() {
-    const managers = await this.managerModel.find().exec();
+    const managers = await this.managerModel
+      .find()
+      .populate({ path: 'association' })
+      .exec();
     return managers.map((manager) => ({
       name: manager.name,
-      user_name: manager.user_name,
       password: manager.password,
+      email: manager.email,
       phone: manager.phone,
-      branch_id: manager.branch_id,
+      association: manager.association,
     }));
   }
 
@@ -62,7 +63,7 @@ export class ManagerService {
   }
 
   async findManager(id: string) {
-    let manager;
+    let manager: any;
     try {
       manager = await this.managerModel.findById(id);
     } catch (error) {
@@ -79,7 +80,6 @@ export class ManagerService {
     return {
       manager_id: manager.manager_id,
       name: manager.name,
-      user_name: manager.user_name,
       password: manager.password,
       phone: manager.phone,
       branch_id: manager.branch_id,
@@ -91,17 +91,14 @@ export class ManagerService {
     if (updateManagerDto.name) {
       updatedManager.name = updateManagerDto.name;
     }
-    if (updateManagerDto.user_name) {
-      updatedManager.user_name = updateManagerDto.user_name;
-    }
     if (updateManagerDto.password) {
       updatedManager.password = updateManagerDto.password;
     }
+    if (updateManagerDto.email) {
+      updatedManager.email = updateManagerDto.email;
+    }
     if (updateManagerDto.phone) {
       updatedManager.phone = updateManagerDto.phone;
-    }
-    if (updateManagerDto.branch_id) {
-      updatedManager.branch_id = updateManagerDto.branch_id;
     }
     await updatedManager.save();
     return `This action updates a #${id} manager`;

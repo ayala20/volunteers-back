@@ -2,17 +2,17 @@ import * as mongoose from 'mongoose';
 
 export const ManagerSchema = new mongoose.Schema({
   name: String,
-  user_name: String,
   password: String,
+  email: { type: String, unique: true },
   phone: String,
-  branch_id: mongoose.Types.ObjectId,
+  association: { type: mongoose.Schema.Types.ObjectId, ref: 'Association' },
 });
 
 export interface Manager extends mongoose.Document {
   manager_id: string;
   name: string;
-  user_name: string;
   password: string;
+  email: string;
   phone: string;
-  branch_id: mongoose.Types.ObjectId;
+  association: mongoose.Schema.Types.ObjectId;
 }
