@@ -8,7 +8,7 @@ export const AssociationSchema = new mongoose.Schema({
   password: String,
   file: String,
   logo_image: String,
-  is_approved: Boolean,
+  is_approved: { type: Boolean, default: false },
 });
 
 export interface Association extends mongoose.Document {

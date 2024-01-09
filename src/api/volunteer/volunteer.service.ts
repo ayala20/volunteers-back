@@ -4,6 +4,8 @@ import { UpdateVolunteerDto } from './dto/update-volunteer.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Volunteer } from './entities/volunteer.entity';
+import * as bcrypt from 'bcrypt';
+import { IncorrectPasswordException } from 'src/exceptions/incorrect-password-exception';
 
 @Injectable()
 export class VolunteerService {
@@ -12,14 +14,10 @@ export class VolunteerService {
   ) {}
 
   async create(createVolunteerDto: CreateVolunteerDto) {
-    const newVolunteer = new this.volunteerModel({
-      full_name: createVolunteerDto.full_name,
-      address: createVolunteerDto.address,
-      phone: createVolunteerDto.phone,
-      dateOfBirth: createVolunteerDto.dateOfBirth,
-      id_number: createVolunteerDto.id_number,
-      password: createVolunteerDto.password,
-    });
+    const salt = await bcrypt.genSalt();
+    const hashPassword = await bcrypt.hash(createVolunteerDto.password, salt);
+    createVolunteerDto.password = hashPassword;
+    const newVolunteer = new this.volunteerModel(createVolunteerDto);
     const volunteer = await newVolunteer.save();
     return {
       id: volunteer.id,
@@ -29,21 +27,28 @@ export class VolunteerService {
       dateOfBirth: volunteer.dateOfBirth,
       id_number: volunteer.id_number,
       password: volunteer.password,
+      roleUser: 1,
     };
   }
 
   async signIn(idNumber: string, password: string) {
     let volunteer;
+    let match: boolean;
     try {
       volunteer = await this.volunteerModel.findOne({
         id_number: idNumber,
-        password: password,
       });
+      if (volunteer) {
+        match = await bcrypt.compare(password, volunteer.password);
+      }
     } catch (error) {
       throw new NotFoundException('Could not find Volunteer.');
     }
     if (!volunteer) {
       throw new NotFoundException('Could not find Volunteer.');
+    }
+    if (!match) {
+      throw new IncorrectPasswordException('Your password is incorrect');
     }
     return {
       id: volunteer.id,
@@ -53,6 +58,7 @@ export class VolunteerService {
       dateOfBirth: volunteer.dateOfBirth,
       id_number: volunteer.id_number,
       password: volunteer.password,
+      roleUser: 1,
     };
   }
 

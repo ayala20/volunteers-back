@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Controller,
   Get,
@@ -6,23 +7,59 @@ import {
   Put,
   Param,
   Delete,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { AssociationService } from './association.service';
 import { CreateAssociationDto } from './dto/create-association.dto';
 import { UpdateAssociationDto } from './dto/update-association.dto';
+// import * as fs from 'fs';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 
 @Controller('api/association')
 export class AssociationController {
+  private createAssociationDto: CreateAssociationDto;
   constructor(private readonly associationService: AssociationService) {}
 
   @Post()
   create(@Body() createAssociationDto: CreateAssociationDto) {
-    return this.associationService.create(createAssociationDto);
+    return JSON.stringify(this.associationService.create(createAssociationDto));
   }
 
-  @Get()
-  findAll() {
-    return this.associationService.findAll();
+  @Post('uploadFile')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './public/pdf',
+        filename: (req, file, callback) => {
+          const uniqueSuffix = file.originalname;
+          callback(null, uniqueSuffix);
+        },
+      }),
+    }),
+  )
+  uploadFile(@UploadedFile() file) {
+    return JSON.stringify(file);
+  }
+
+  @Post('uploadImage')
+  @UseInterceptors(FileInterceptor('image', {
+    storage: diskStorage({
+      destination: './public/images',
+      filename: (req, file, callback) => {
+        const uniqueSuffix = file.originalname;
+        callback(null, uniqueSuffix);
+      },
+    }),
+  }),)
+  uploadImage(@UploadedFile() file) {
+    return JSON.stringify(file.filename);
+  }
+
+  @Get(':is_approved')
+  findAll(@Param('is_approved') is_approved: boolean) {
+    return this.associationService.findAll(is_approved);
   }
 
   @Get(':id')

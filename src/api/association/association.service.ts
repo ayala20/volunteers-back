@@ -12,17 +12,14 @@ export class AssociationService {
   ) {}
 
   async create(createAssociationDto: CreateAssociationDto) {
-    const newAssociation = new this.associationModel({
-      ...createAssociationDto,
-      is_approved: false,
-    });
+    const newAssociation = new this.associationModel(createAssociationDto);
     const result = await newAssociation.save();
     return result.id;
   }
 
-  async findAll() {
+  async findAll(is_approved: boolean) {
     const associations = await this.associationModel
-      .find({ is_approved: true })
+      .find({ is_approved })
       .exec();
     return associations.map((association) => ({
       id: association.id,

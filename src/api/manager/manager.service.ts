@@ -4,12 +4,20 @@ import { UpdateManagerDto } from './dto/update-manager.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Manager } from './entities/manager.entity';
 import { Model } from 'mongoose';
+import * as dotenv from 'dotenv';
+import * as bcrypt from 'bcrypt';
+import { IncorrectPasswordException } from 'src/exceptions/incorrect-password-exception';
+
+dotenv.config();
 
 @Injectable()
 export class ManagerService {
   constructor(@InjectModel('Manager') private managerModel: Model<Manager>) {}
 
   async create(createManagerDto: CreateManagerDto) {
+    const salt = await bcrypt.genSalt();
+    const hashPassword = await bcrypt.hash(createManagerDto.password, salt);
+    createManagerDto.password = hashPassword;
     const newManager = new this.managerModel(createManagerDto);
     let manager: any;
     try {
@@ -23,6 +31,7 @@ export class ManagerService {
       email: manager.email,
       phone: manager.phone,
       association: manager.association,
+      roleUser: 2,
     };
   }
 
@@ -40,18 +49,32 @@ export class ManagerService {
     }));
   }
 
-  async signIn(userName: string, password: string) {
-    let manager;
+  async signIn(email: string, password: string) {
+    let manager: any;
+    let match: boolean = false;
+    if (email == process.env.MANAGER_EMAIL) {
+      match = await bcrypt.compare(password, process.env.MANAGER_PASSWORD);
+      if (match) {
+        return {
+          email: email,
+          password: process.env.MANAGER_PASSWORD,
+          roleUser: 3,
+        };
+      }
+    }
     try {
-      manager = await this.managerModel.findOne({
-        user_name: userName,
-        password: password,
-      });
+      manager = await this.managerModel.findOne({ email });
+      if (manager) {
+        match = await bcrypt.compare(password, manager.password);
+      }
     } catch (error) {
       throw new NotFoundException('Could not find Manager.');
     }
     if (!manager) {
       throw new NotFoundException('Could not find Manager.');
+    }
+    if (!match) {
+      throw new IncorrectPasswordException('Your password is incorrect');
     }
     return {
       name: manager.name,
@@ -59,6 +82,7 @@ export class ManagerService {
       password: manager.password,
       phone: manager.phone,
       branch_id: manager.branch_id,
+      roleUser: 2,
     };
   }
 

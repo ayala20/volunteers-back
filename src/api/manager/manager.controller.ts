@@ -25,13 +25,9 @@ export class ManagerController {
     return this.managerService.findAll();
   }
 
-  @Get('signIn/:userName/:password')
-  signIn(
-    @Param('userName') userName: string,
-    @Param('password') password: string,
-  ) {
-    console.log(userName, password);
-    return this.managerService.signIn(userName, password);
+  @Get('signIn/:email/:password')
+  signIn(@Param('email') email: string, @Param('password') password: string) {
+    return this.managerService.signIn(email, password);
   }
 
   @Get(':id')
