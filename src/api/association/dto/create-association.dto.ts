@@ -1,3 +1,9 @@
+export enum StatusAssociation {
+  NEW = 'NEW',
+  APPROVED = 'APPROVED',
+  FAILED = 'FAILED',
+}
+
 export class CreateAssociationDto {
   constructor(
     public id: string,
@@ -8,6 +14,6 @@ export class CreateAssociationDto {
     public password: string,
     public file: string,
     public logo_image: string,
-    public is_approved: boolean,
+    public status: StatusAssociation,
   ) {}
 }

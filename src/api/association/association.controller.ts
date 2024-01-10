@@ -11,9 +11,8 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { AssociationService } from './association.service';
-import { CreateAssociationDto } from './dto/create-association.dto';
+import { CreateAssociationDto, StatusAssociation } from './dto/create-association.dto';
 import { UpdateAssociationDto } from './dto/update-association.dto';
-// import * as fs from 'fs';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 
@@ -57,9 +56,9 @@ export class AssociationController {
     return JSON.stringify(file.filename);
   }
 
-  @Get(':is_approved')
-  findAll(@Param('is_approved') is_approved: boolean) {
-    return this.associationService.findAll(is_approved);
+  @Get(':status')
+  findAll(@Param('status') status: StatusAssociation) {
+    return this.associationService.findAll(status);
   }
 
   @Get(':id')
@@ -75,9 +74,12 @@ export class AssociationController {
     return this.associationService.update(id, updateAssociationDto);
   }
 
-  @Put(':id')
-  updateToApproved(@Param('id') id: string) {
-    return this.associationService.updateToApproved(id);
+  @Put(':id/:status')
+  updateStatus(
+    @Param('id') id: string,
+    @Param('status') status: string,
+  ) {
+    return JSON.stringify(this.associationService.updateStatus(id, status));
   }
 
   @Delete(':id')

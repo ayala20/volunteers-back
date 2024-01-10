@@ -1,4 +1,5 @@
 import * as mongoose from 'mongoose';
+import { StatusAssociation } from '../dto/create-association.dto';
 
 export const AssociationSchema = new mongoose.Schema({
   name: String,
@@ -8,7 +9,7 @@ export const AssociationSchema = new mongoose.Schema({
   password: String,
   file: String,
   logo_image: String,
-  is_approved: { type: Boolean, default: false },
+  status: { type: String, default: StatusAssociation.NEW },
 });
 
 export interface Association extends mongoose.Document {

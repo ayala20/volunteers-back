@@ -1,0 +1,43 @@
+<!-- ... -->
+<!-- <p>Hello {{name}},</p> 
+<p class="m-0 ... sm:leading-8">
+  Is it you we're looking for?
+</p>
+<p class="m-0 mb-6">
+  Please confirm your email address by clicking the button below:
+</p>
+<div class="leading-full">
+{{message}}{{password}}{{status}}
+    <span class="mso-text-raise-4">Confirm email address &rarr;</span>
+</div> -->
+<!-- ... -->
+<!DOCTYPE html>
+<html dir="rtl">
+
+<head>
+  <title>Your Email</title>
+  <style>
+    p {
+      font-size: 20px;
+    }
+  </style>
+</head>
+
+<body style="text-align: right; direction: rtl;">
+  <div style="padding: 30px; background-color: rgba(229, 52, 53, 0.2); height: 100%;">
+    <p><strong>שלום עמותת {{ name }},</strong></p>
+    <p>בנוגע לבקשת פתיחת מערך התנדבות באתר "התנדבות רפואית"</p>
+    <p>הנהלת האתר בחנה את בקשתכם, ועל כן</p>
+    <p>רצינו לידע שהבקשה {{ message }}</p>
+    <p>{{ m1 }}</p>
+    <h2>{{ password }}</h2>
+    <p>{{ m2 }}</p>
+    <br />
+    <p>חווית המתנדב באתר עומדת בראש מעינינו</p>
+    <p>אנו מודים לכם על העזרה בהשגת מטרתינו</p>
+    <p>בהצלחה בכל!</p>
+  </div>
+
+</body>
+
+</html>

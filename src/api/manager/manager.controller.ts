@@ -14,7 +14,6 @@ import { UpdateManagerDto } from './dto/update-manager.dto';
 @Controller('api/manager')
 export class ManagerController {
   constructor(private readonly managerService: ManagerService) {}
-
   @Post()
   create(@Body() createManagerDto: CreateManagerDto) {
     return this.managerService.create(createManagerDto);

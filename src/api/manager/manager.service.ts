@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateManagerDto } from './dto/create-manager.dto';
 import { UpdateManagerDto } from './dto/update-manager.dto';
@@ -7,14 +8,23 @@ import { Model } from 'mongoose';
 import * as dotenv from 'dotenv';
 import * as bcrypt from 'bcrypt';
 import { IncorrectPasswordException } from 'src/exceptions/incorrect-password-exception';
+import { AssociationService } from '../association/association.service';
 
 dotenv.config();
 
 @Injectable()
 export class ManagerService {
-  constructor(@InjectModel('Manager') private managerModel: Model<Manager>) {}
+  constructor(@InjectModel('Manager') private managerModel: Model<Manager>,
+    private readonly associationService: AssociationService) { }
 
   async create(createManagerDto: CreateManagerDto) {
+    const obj: any = this.associationService.findOne(createManagerDto.association);
+    const match: boolean = await bcrypt.compare(createManagerDto.passwordAssociation, (await obj).password);
+    if (!match) {
+      throw new IncorrectPasswordException("The association's password is incorrect!")
+    }
+
+    // הכנסת המנהל לנתונים
     const salt = await bcrypt.genSalt();
     const hashPassword = await bcrypt.hash(createManagerDto.password, salt);
     createManagerDto.password = hashPassword;

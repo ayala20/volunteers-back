@@ -1,15 +1,22 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateAssociationDto } from './dto/create-association.dto';
+/* eslint-disable prettier/prettier */
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateAssociationDto } from './dto/update-association.dto';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Association } from './entities/association.entity';
+import {
+  CreateAssociationDto,
+  StatusAssociation,
+} from './dto/create-association.dto';
+import { MailerService } from '@nestjs-modules/mailer';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AssociationService {
   constructor(
     @InjectModel('Association') private associationModel: Model<Association>,
-  ) {}
+    private mailerService: MailerService
+  ) { }
 
   async create(createAssociationDto: CreateAssociationDto) {
     const newAssociation = new this.associationModel(createAssociationDto);
@@ -17,9 +24,9 @@ export class AssociationService {
     return result.id;
   }
 
-  async findAll(is_approved: boolean) {
+  async findAll(status: StatusAssociation) {
     const associations = await this.associationModel
-      .find({ is_approved })
+      .find({ status: status })
       .exec();
     return associations.map((association) => ({
       id: association.id,
@@ -60,6 +67,75 @@ export class AssociationService {
     };
   }
 
+  async sendEmail(email: string, status: string, name: string, password?: string) {
+    if (status == StatusAssociation.APPROVED) {
+      await this.mailerService.sendMail({
+        to: email,
+        subject: 'תשובה לבקשת פתיחת מערך התנדבות',
+        template: './transactional.html',
+        context: {
+          name: name,
+          status: "block",
+          password: password,
+          message: "נענתה בחיוב",
+          m1: "קוד העמותה במערכת הינו:",
+          m2: "קוד זה ישמש את האחראים מטעם העמותה לרישום למערכת שלנו"
+        },
+      });
+    }
+    else {
+      await this.mailerService.sendMail({
+        to: email,
+        subject: 'תשובה בנוגע לבקשת מערך התנדבות בחברת התנדבות רפואית',
+        template: './transactional.html',
+        context:
+        {
+          name: name,
+          status: "none",
+          message: "לא אושרה",
+          password: password,
+          m1: "",
+          m2: "",
+        },
+      });
+    }
+  }
+
+  generateRandomCode(length: number): string {
+    const characters: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let code: string = '';
+    for (let i: number = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      code += characters.charAt(randomIndex);
+    }
+    return code;
+  }
+
+  async updateStatus(id: string, status: string) {
+    const updatedAssociation = await this.findAssociation(id);
+    if (status == StatusAssociation.APPROVED) {
+      const password = this.generateRandomCode(8);
+
+      const salt = await bcrypt.genSalt();
+      const hashPassword = await bcrypt.hash(password, salt);
+
+      updatedAssociation.password = hashPassword;
+      this.sendEmail(updatedAssociation.email, status, updatedAssociation.name, password);
+    }
+    if (status == StatusAssociation.FAILED) {
+      this.sendEmail(updatedAssociation.email, status, updatedAssociation.name, "");
+    }
+    if (status) {
+      updatedAssociation.status = status;
+    }
+    try {
+      await updatedAssociation.save();
+    } catch (error) {
+      throw new NotFoundException(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    return `This action updates a #${id} association to approved`;
+  }
+
   async update(id: string, updateAssociationDto: UpdateAssociationDto) {
     const updatedAssociation = await this.findAssociation(id);
     if (updateAssociationDto.name) {
@@ -85,13 +161,6 @@ export class AssociationService {
     }
     await updatedAssociation.save();
     return `This action updates a #${id} association`;
-  }
-
-  async updateToApproved(id: string) {
-    const updatedAssociation = await this.findAssociation(id);
-    updatedAssociation.is_approved = true;
-    await updatedAssociation.save();
-    return `This action updates a #${id} association to approved`;
   }
 
   async remove(id: string) {
