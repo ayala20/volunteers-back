@@ -24,7 +24,6 @@ export class ManagerService {
       throw new IncorrectPasswordException("The association's password is incorrect!")
     }
 
-    // הכנסת המנהל לנתונים
     const salt = await bcrypt.genSalt();
     const hashPassword = await bcrypt.hash(createManagerDto.password, salt);
     createManagerDto.password = hashPassword;
@@ -36,6 +35,7 @@ export class ManagerService {
       throw new NotFoundException('Email is exist!');
     }
     return {
+      id: manager.id,
       name: manager.name,
       password: manager.password,
       email: manager.email,
@@ -87,6 +87,7 @@ export class ManagerService {
       throw new IncorrectPasswordException('Your password is incorrect');
     }
     return {
+      id: manager.id,
       name: manager.name,
       user_name: manager.user_name,
       password: manager.password,
@@ -112,7 +113,7 @@ export class ManagerService {
   async findOne(id: string) {
     const manager = await this.findManager(id);
     return {
-      manager_id: manager.manager_id,
+      id: manager.manager_id,
       name: manager.name,
       password: manager.password,
       phone: manager.phone,

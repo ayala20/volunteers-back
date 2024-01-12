@@ -86,7 +86,7 @@ export class AssociationService {
     else {
       await this.mailerService.sendMail({
         to: email,
-        subject: 'תשובה בנוגע לבקשת מערך התנדבות בחברת התנדבות רפואית',
+        subject: 'תשובה לבקשת פתיחת מערך התנדבות',
         template: './transactional.html',
         context:
         {

@@ -10,6 +10,8 @@ import { AssociationModule } from './api/association/association.module';
 import * as dotenv from 'dotenv';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { FreeActivityModule } from './api/free-activity/free-activity.module';
+import { FeedbackModule } from './api/feedback/feedback.module';
 dotenv.config();
 
 @Module({
@@ -23,6 +25,8 @@ dotenv.config();
     ManagerModule,
     DistrictModule,
     AssociationModule,
+    FreeActivityModule,
+    FeedbackModule,
   ],
   controllers: [AppController],
   providers: [AppService],

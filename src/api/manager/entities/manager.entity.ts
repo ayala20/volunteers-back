@@ -9,7 +9,7 @@ export const ManagerSchema = new mongoose.Schema({
 });
 
 export interface Manager extends mongoose.Document {
-  manager_id: string;
+  id: string;
   name: string;
   password: string;
   email: string;
