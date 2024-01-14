@@ -14,7 +14,7 @@ import { UpdateFreeActivityDto } from './dto/update-free-activity.dto';
 
 @Controller('api/free-activity')
 export class FreeActivityController {
-  constructor(private readonly freeActivityService: FreeActivityService) {}
+  constructor(private readonly freeActivityService: FreeActivityService) { }
 
   @Post()
   create(@Body() createFreeActivityDto: CreateFreeActivityDto) {
@@ -26,9 +26,14 @@ export class FreeActivityController {
     return this.freeActivityService.findAll();
   }
 
-  @Get('/findAllRequest')
-  findAllRequest() {
-    return this.freeActivityService.findAllRequest();
+  @Get('/findAllRequestByManagerAndStatus/:managerId/:statuses')
+  findAllRequestByManagerAndStatus(@Param('managerId') managerId: string, @Param('statuses') statuses: string) {
+    return this.freeActivityService.findAllRequestByManagerAndStatus(managerId, statuses);
+  }
+
+  @Get('/findAllRequestByVolunteerAndStatus/:volunteerId/:statuses')
+  findAllRequestByVolunteerAndStatus(@Param('volunteerId') volunteerId: string, @Param('statuses') statuses: string) {
+    return this.freeActivityService.findAllRequestByVolunteerAndStatus(volunteerId, statuses);
   }
 
   @Get(':districtId/:categoryId')
@@ -47,6 +52,16 @@ export class FreeActivityController {
     @Body() updateFreeActivityDto: UpdateFreeActivityDto,
   ) {
     return this.freeActivityService.update(id, updateFreeActivityDto);
+  }
+
+  @Put(':freeActivityId/:userId/:status')
+  updateStatus(
+    @Param('freeActivityId') freeActivityId: string,
+    @Param('userId') userId: string,
+    @Param('status') status: string,
+
+  ) {
+    return JSON.stringify(this.freeActivityService.updateStatus(freeActivityId, userId, status));
   }
 
   @Delete(':id')

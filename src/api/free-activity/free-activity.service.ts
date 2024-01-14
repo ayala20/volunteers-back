@@ -1,18 +1,20 @@
+/* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateFreeActivityDto } from './dto/create-free-activity.dto';
 import { UpdateFreeActivityDto } from './dto/update-free-activity.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { FreeActivity } from './entities/free-activity.entity';
 import { Model } from 'mongoose';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class FreeActivityService {
   constructor(
     @InjectModel('FreeActivity') private freeActivityModel: Model<FreeActivity>,
-  ) {}
+    private mailService: MailService,
+  ) { }
 
   async create(createFreeActivityDto: CreateFreeActivityDto) {
-    debugger;
     const newFreeActivity = new this.freeActivityModel(createFreeActivityDto);
     const result = await newFreeActivity.save();
     return result.id;
@@ -23,18 +25,71 @@ export class FreeActivityService {
     return freeActivities;
   }
 
-  async findAllRequest() {
-    const freeActivities = await this.freeActivityModel
-      .find({ status: 'REQUEST' })
-      .exec();
-    return freeActivities;
+  async findAllRequestByManagerAndStatus(managerId: string, statuses: string) {
+    const arr = statuses.split(',');
+    let freeActivities = []
+    try {
+      freeActivities = await this.freeActivityModel
+        .find({ status: { $in: arr }, manager: managerId })
+        .populate({ path: 'volunteer' })
+        .exec();
+    } catch (error) {
+      return freeActivities;
+    }
+    return freeActivities.map((freeActivitie) => ({
+      freeActivity_id: freeActivitie.id,
+      name: freeActivitie.name,
+      manager: freeActivitie.manager,
+      category: freeActivitie.category,
+      district: freeActivitie.district,
+      feedback: freeActivitie.feedback,
+      volunteer: freeActivitie.volunteer,
+      description: freeActivitie.description,
+      dateAndTime: freeActivitie.dateAndTime,
+      address: freeActivitie.address,
+      status: freeActivitie.status,
+    }));
+  }
+
+  async findAllRequestByVolunteerAndStatus(
+    volunteerId: string,
+    statuses: string,
+  ) {
+    const arr = statuses.split(',');
+    let freeActivities = []
+    try {
+      freeActivities = await this.freeActivityModel
+        .find({ status: { $in: arr }, volunteer: volunteerId })
+        .populate({
+          path: 'manager',
+          populate: {
+            path: 'association',
+          },
+        })
+        .populate({ path: 'category' })
+        .exec();
+    } catch (error) {
+      return freeActivities;
+    }
+    return freeActivities.map((freeActivitie) => ({
+      freeActivity_id: freeActivitie.id,
+      name: freeActivitie.name,
+      manager: freeActivitie.manager,
+      category: freeActivitie.category,
+      district: freeActivitie.district,
+      feedback: freeActivitie.feedback,
+      volunteer: freeActivitie.volunteer,
+      description: freeActivitie.description,
+      dateAndTime: freeActivitie.dateAndTime,
+      address: freeActivitie.address,
+      status: freeActivitie.status,
+    }));
   }
 
   async filterFreeActivitiesByDistrictAndCategory(
     districtId: string,
     categoryId: string,
   ) {
-    debugger;
     let objd;
     let objc;
     if (districtId != '1') {
@@ -55,13 +110,26 @@ export class FreeActivityService {
         },
       })
       .exec();
-    return freeActivities;
+    return freeActivities.map((freeActivitie) => ({
+      freeActivity_id: freeActivitie.id,
+      name: freeActivitie.name,
+      manager: freeActivitie.manager,
+      category: freeActivitie.category,
+      district: freeActivitie.district,
+      feedback: freeActivitie.feedback,
+      volunteer: freeActivitie.volunteer,
+      description: freeActivitie.description,
+      dateAndTime: freeActivitie.dateAndTime,
+      address: freeActivitie.address,
+      status: freeActivitie.status,
+    }));
   }
 
   async findFreeActivity(id: string) {
     let freeActivity: any;
     try {
-      freeActivity = await this.freeActivityModel.findById(id);
+      freeActivity = (await this.freeActivityModel.findById(id))
+        .populate({ path: 'volunteer' });
     } catch (error) {
       throw new NotFoundException('Could not find Feedback.');
     }
@@ -98,6 +166,18 @@ export class FreeActivityService {
     }
     await updatedFreeActivity.save();
     return `This action updates a #${id} freeActivity`;
+  }
+
+  async updateStatus(freeActivityId: string, userId: string, status: string) {
+    const updatedFreeActivity = await this.findFreeActivity(freeActivityId);
+    updatedFreeActivity.status = status;
+    if (userId != '1') {
+      updatedFreeActivity.volunteer = userId;
+    } else {
+      this.mailService.sendingAnEmailToAVolunteer(updatedFreeActivity.volunteer.email, updatedFreeActivity.name, updatedFreeActivity.volunteer.full_name, status)
+    }
+    await updatedFreeActivity.save();
+    return `This action updates a #${freeActivityId} freeActivity`;
   }
 
   async remove(id: string) {

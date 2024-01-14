@@ -7,6 +7,7 @@ export const VolunteerSchema = new mongoose.Schema({
   dateOfBirth: Date,
   id_number: String,
   password: String,
+  email: String,
 });
 
 export interface Volunteer extends mongoose.Document {
@@ -17,4 +18,5 @@ export interface Volunteer extends mongoose.Document {
   dateOfBirth: Date;
   id_number: string;
   password: string;
+  email: string;
 }

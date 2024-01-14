@@ -27,6 +27,7 @@ export class VolunteerService {
       dateOfBirth: volunteer.dateOfBirth,
       id_number: volunteer.id_number,
       password: volunteer.password,
+      email: volunteer.email,
       roleUser: 1,
     };
   }
@@ -58,6 +59,7 @@ export class VolunteerService {
       dateOfBirth: volunteer.dateOfBirth,
       id_number: volunteer.id_number,
       password: volunteer.password,
+      email: volunteer.email,
       roleUser: 1,
     };
   }
@@ -72,6 +74,7 @@ export class VolunteerService {
       dateOfBirth: volunteer.dateOfBirth,
       id_number: volunteer.id_number,
       password: volunteer.password,
+      email: volunteer.email,
     }));
   }
 
@@ -98,6 +101,7 @@ export class VolunteerService {
       dateOfBirth: volunteer.dateOfBirth,
       id_number: volunteer.id_number,
       password: volunteer.password,
+      email: volunteer.email,
     };
   }
 

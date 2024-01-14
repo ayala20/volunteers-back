@@ -10,12 +10,14 @@ import {
 } from './dto/create-association.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import * as bcrypt from 'bcrypt';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AssociationService {
   constructor(
     @InjectModel('Association') private associationModel: Model<Association>,
-    private mailerService: MailerService
+    private mailerService: MailerService,
+    private mailService: MailService
   ) { }
 
   async create(createAssociationDto: CreateAssociationDto) {
@@ -67,40 +69,6 @@ export class AssociationService {
     };
   }
 
-  async sendEmail(email: string, status: string, name: string, password?: string) {
-    if (status == StatusAssociation.APPROVED) {
-      await this.mailerService.sendMail({
-        to: email,
-        subject: 'תשובה לבקשת פתיחת מערך התנדבות',
-        template: './transactional.html',
-        context: {
-          name: name,
-          status: "block",
-          password: password,
-          message: "נענתה בחיוב",
-          m1: "קוד העמותה במערכת הינו:",
-          m2: "קוד זה ישמש את האחראים מטעם העמותה לרישום למערכת שלנו"
-        },
-      });
-    }
-    else {
-      await this.mailerService.sendMail({
-        to: email,
-        subject: 'תשובה לבקשת פתיחת מערך התנדבות',
-        template: './transactional.html',
-        context:
-        {
-          name: name,
-          status: "none",
-          message: "לא אושרה",
-          password: password,
-          m1: "",
-          m2: "",
-        },
-      });
-    }
-  }
-
   generateRandomCode(length: number): string {
     const characters: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let code: string = '';
@@ -120,10 +88,10 @@ export class AssociationService {
       const hashPassword = await bcrypt.hash(password, salt);
 
       updatedAssociation.password = hashPassword;
-      this.sendEmail(updatedAssociation.email, status, updatedAssociation.name, password);
+      this.mailService.sendingAnEmailToTheAssociation(updatedAssociation.email, status, updatedAssociation.name, password);
     }
     if (status == StatusAssociation.FAILED) {
-      this.sendEmail(updatedAssociation.email, status, updatedAssociation.name, "");
+      this.mailService.sendingAnEmailToTheAssociation(updatedAssociation.email, status, updatedAssociation.name, "");
     }
     if (status) {
       updatedAssociation.status = status;

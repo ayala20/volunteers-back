@@ -6,5 +6,6 @@ export class CreateVolunteerDto {
     public dateOfBirth: Date,
     public id_number: string,
     public password: string,
+    public email: string,
   ) {}
 }

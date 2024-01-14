@@ -12,6 +12,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { FreeActivityModule } from './api/free-activity/free-activity.module';
 import { FeedbackModule } from './api/feedback/feedback.module';
+import { MailModule } from './mail/mail.module';
 dotenv.config();
 
 @Module({
@@ -27,6 +28,7 @@ dotenv.config();
     AssociationModule,
     FreeActivityModule,
     FeedbackModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
