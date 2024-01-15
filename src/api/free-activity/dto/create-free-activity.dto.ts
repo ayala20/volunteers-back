@@ -1,7 +1,6 @@
 export enum StatusFreeActivity {
   WAITING = 'WAITING',
   REQUEST = 'REQUEST',
-  APPROVED = 'APPROVED',
   TAKEN = 'TAKEN',
   DONE = 'DONE',
 }

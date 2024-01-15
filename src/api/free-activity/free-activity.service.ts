@@ -71,6 +71,10 @@ export class FreeActivityService {
     } catch (error) {
       return freeActivities;
     }
+    return this.fromArrSchemaToRegular(freeActivities);
+  }
+
+  async fromArrSchemaToRegular(freeActivities: any[]) {
     return freeActivities.map((freeActivitie) => ({
       freeActivity_id: freeActivitie.id,
       name: freeActivitie.name,
@@ -86,12 +90,8 @@ export class FreeActivityService {
     }));
   }
 
-  async filterFreeActivitiesByDistrictAndCategory(
-    districtId: string,
-    categoryId: string,
-  ) {
-    let objd;
-    let objc;
+  async filterFreeActivitiesByDistrictAndCategory(districtId: string, categoryId: string) {
+    let objd, objc;
     if (districtId != '1') {
       objd = { district: districtId };
     }
@@ -110,19 +110,7 @@ export class FreeActivityService {
         },
       })
       .exec();
-    return freeActivities.map((freeActivitie) => ({
-      freeActivity_id: freeActivitie.id,
-      name: freeActivitie.name,
-      manager: freeActivitie.manager,
-      category: freeActivitie.category,
-      district: freeActivitie.district,
-      feedback: freeActivitie.feedback,
-      volunteer: freeActivitie.volunteer,
-      description: freeActivitie.description,
-      dateAndTime: freeActivitie.dateAndTime,
-      address: freeActivitie.address,
-      status: freeActivitie.status,
-    }));
+    return this.fromArrSchemaToRegular(freeActivities);
   }
 
   async findFreeActivity(id: string) {
@@ -131,10 +119,10 @@ export class FreeActivityService {
       freeActivity = (await this.freeActivityModel.findById(id))
         .populate({ path: 'volunteer' });
     } catch (error) {
-      throw new NotFoundException('Could not find Feedback.');
+      throw new NotFoundException('Could not find FreeActivity.');
     }
     if (!freeActivity) {
-      throw new NotFoundException('Could not find Feedback.');
+      throw new NotFoundException('Could not find FreeActivity.');
     }
     return freeActivity;
   }

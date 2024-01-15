@@ -44,7 +44,7 @@ export class MailService {
   }
 
   async sendingAnEmailToAVolunteer(email: string, nameA: string, name: string, status: string) {
-    if (status == StatusFreeActivity.APPROVED) {
+    if (status == StatusFreeActivity.TAKEN) {
       await this.mailerService.sendMail({
         to: email,
         subject: 'תשובה לבקשת התנדבות',
