@@ -2,6 +2,7 @@ import * as mongoose from 'mongoose';
 import { StatusAssociation } from '../dto/create-association.dto';
 
 export const AssociationSchema = new mongoose.Schema({
+  number: Number,
   name: String,
   address: String,
   email: String,
@@ -14,6 +15,7 @@ export const AssociationSchema = new mongoose.Schema({
 
 export interface Association extends mongoose.Document {
   id: string;
+  number: number;
   name: string;
   address: string;
   email: string;

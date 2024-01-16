@@ -6,7 +6,6 @@ export const FreeActivitySchema = new mongoose.Schema({
   manager: { type: mongoose.Schema.Types.ObjectId, ref: 'Manager' },
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
   district: { type: mongoose.Schema.Types.ObjectId, ref: 'District' },
-  feedback: { type: mongoose.Schema.Types.ObjectId, ref: 'Feedback' },
   volunteer: { type: mongoose.Schema.Types.ObjectId, ref: 'Volunteer' },
   description: String,
   dateAndTime: Date,
@@ -20,7 +19,6 @@ export interface FreeActivity extends mongoose.Document {
   manager: mongoose.Schema.Types.ObjectId;
   category: mongoose.Schema.Types.ObjectId;
   district: mongoose.Schema.Types.ObjectId;
-  feedback: mongoose.Schema.Types.ObjectId;
   volunteer: mongoose.Schema.Types.ObjectId;
   description: string;
   dateAndTime: Date;

@@ -30,6 +30,7 @@ export class AssociationService {
       .exec();
     return associations.map((association) => ({
       id: association.id,
+      number: association.number,
       name: association.name,
       address: association.address,
       email: association.email,
@@ -57,6 +58,7 @@ export class AssociationService {
     const association = await this.findAssociation(id);
     return {
       id: association.id,
+      number: association.number,
       name: association.name,
       address: association.address,
       email: association.email,
@@ -104,6 +106,9 @@ export class AssociationService {
 
   async update(id: string, updateAssociationDto: UpdateAssociationDto) {
     const updatedAssociation = await this.findAssociation(id);
+    if (updateAssociationDto.number) {
+      updatedAssociation.number = updateAssociationDto.number;
+    }
     if (updateAssociationDto.name) {
       updatedAssociation.name = updateAssociationDto.name;
     }

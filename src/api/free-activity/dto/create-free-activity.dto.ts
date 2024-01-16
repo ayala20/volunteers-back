@@ -12,7 +12,6 @@ export class CreateFreeActivityDto {
     public manager: string,
     public category: string,
     public district: string,
-    public feedback: string,
     public volunteer: string,
     public description: string,
     public dateAndTime: Date,

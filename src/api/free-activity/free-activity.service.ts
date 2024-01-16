@@ -43,7 +43,6 @@ export class FreeActivityService {
       manager: freeActivitie.manager,
       category: freeActivitie.category,
       district: freeActivitie.district,
-      feedback: freeActivitie.feedback,
       volunteer: freeActivitie.volunteer,
       description: freeActivitie.description,
       dateAndTime: freeActivitie.dateAndTime,
@@ -82,7 +81,6 @@ export class FreeActivityService {
       manager: freeActivitie.manager,
       category: freeActivitie.category,
       district: freeActivitie.district,
-      feedback: freeActivitie.feedback,
       volunteer: freeActivitie.volunteer,
       description: freeActivitie.description,
       dateAndTime: freeActivitie.dateAndTime,
@@ -162,7 +160,7 @@ export class FreeActivityService {
     updatedFreeActivity.status = status;
     if (userId != '1') {
       updatedFreeActivity.volunteer = userId;
-    } else {
+    } else if (status != 'DONE') {
       this.mailService.sendingAnEmailToAVolunteer(updatedFreeActivity.volunteer.email, updatedFreeActivity.name, updatedFreeActivity.volunteer.full_name, status)
     }
     await updatedFreeActivity.save();

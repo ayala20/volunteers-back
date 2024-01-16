@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Controller,
   Get,
@@ -13,11 +14,11 @@ import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 
 @Controller('api/feedback')
 export class FeedbackController {
-  constructor(private readonly feedbackService: FeedbackService) {}
+  constructor(private readonly feedbackService: FeedbackService) { }
 
-  @Post()
+  @Post('')
   create(@Body() createFeedbackDto: CreateFeedbackDto) {
-    return this.feedbackService.create(createFeedbackDto);
+    return JSON.stringify(this.feedbackService.create(createFeedbackDto));
   }
 
   @Get()

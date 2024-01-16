@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
@@ -23,6 +24,7 @@ export class FeedbackService {
       feedback_id: feedback.id,
       date: feedback.date,
       rating: feedback.rating,
+      note: feedback.note,
     }));
   }
 
@@ -45,6 +47,7 @@ export class FeedbackService {
       district_id: feedback.id,
       date: feedback.date,
       rating: feedback.rating,
+      note: feedback.note,
     };
   }
 
