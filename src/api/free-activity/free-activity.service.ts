@@ -32,6 +32,7 @@ export class FreeActivityService {
       freeActivities = await this.freeActivityModel
         .find({ status: { $in: arr }, manager: managerId })
         .populate({ path: 'volunteer' })
+        .populate({ path: 'category' })
         .exec();
     } catch (error) {
       return freeActivities;

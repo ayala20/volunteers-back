@@ -8,7 +8,6 @@ import {
   CreateAssociationDto,
   StatusAssociation,
 } from './dto/create-association.dto';
-import { MailerService } from '@nestjs-modules/mailer';
 import * as bcrypt from 'bcrypt';
 import { MailService } from 'src/mail/mail.service';
 
@@ -16,7 +15,6 @@ import { MailService } from 'src/mail/mail.service';
 export class AssociationService {
   constructor(
     @InjectModel('Association') private associationModel: Model<Association>,
-    private mailerService: MailerService,
     private mailService: MailService
   ) { }
 
