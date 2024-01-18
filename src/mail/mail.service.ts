@@ -47,7 +47,7 @@ export class MailService {
     if (status == StatusFreeActivity.TAKEN) {
       await this.mailerService.sendMail({
         to: email,
-        subject: 'תשובה לבקשת התנדבות',
+        subject: `תשובה לבקשת התנדבות ${nameA}`,
         template: './aOrROfVolunteering.html',
         context: {
           name: name,
@@ -60,7 +60,7 @@ export class MailService {
     else {
       await this.mailerService.sendMail({
         to: email,
-        subject: 'תשובה לבקשת פתיחת מערך התנדבות',
+        subject: `תשובה לבקשת התנדבות ${nameA}`,
         template: './aOrROfVolunteering.html',
         context:
         {

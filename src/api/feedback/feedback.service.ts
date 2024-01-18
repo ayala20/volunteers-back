@@ -3,7 +3,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import { Feedback } from './entities/feedback.entity';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
@@ -19,13 +19,47 @@ export class FeedbackService {
   }
 
   async findAll() {
-    const feedbacks = await this.feedbackModel.find().exec();
-    return feedbacks.map((feedback) => ({
-      feedback_id: feedback.id,
-      date: feedback.date,
-      rating: feedback.rating,
-      note: feedback.note,
-    }));
+    const feedbacks = await this.feedbackModel.aggregate([
+      {
+        $lookup: {
+          from: 'freeactivities',
+          localField: 'idFreeActivity',
+          foreignField: '_id',
+          as: 'freeActivityData',
+        },
+      },
+      {
+        $unwind: '$freeActivityData',
+      },
+      {
+        $lookup: {
+          from: 'volunteers',
+          localField: 'freeActivityData.volunteer',
+          foreignField: '_id',
+          as: 'volunteerData',
+        },
+      },
+      {
+        $unwind: '$volunteerData',
+      },
+      {
+        $project: {
+          _id: 1,
+          date: 1,
+          rating: 1,
+          note: 1,
+          freeActivityData: 1,
+          volunteerData: 1,
+        },
+      },
+    ]);
+    return feedbacks;
+    // return feedbacks.map((feedback) => ({
+    //   feedback_id: feedback.id,
+    //   date: feedback.date,
+    //   rating: feedback.rating,
+    //   note: feedback.note,
+    // }));
   }
 
   async findFeedback(id: string) {
@@ -49,6 +83,39 @@ export class FeedbackService {
       rating: feedback.rating,
       note: feedback.note,
     };
+  }
+
+  async getFeedbackByVolunteerId(volunteerId: string) {
+    const feedbacks = await this.feedbackModel.aggregate([
+      {
+        $lookup: {
+          from: 'freeactivities',
+          localField: 'idFreeActivity',
+          foreignField: '_id',
+          as: 'freeActivityData',
+        },
+      },
+      {
+        $unwind: '$freeActivityData',
+      },
+      {
+        $match: {
+          'freeActivityData.volunteer': new mongoose.Types.ObjectId(
+            volunteerId,
+          ),
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          date: 1,
+          rating: 1,
+          note: 1,
+          freeActivityData: 1,
+        },
+      },
+    ]);
+    return feedbacks;
   }
 
   async update(id: string, updateFeedbackDto: UpdateFeedbackDto) {
