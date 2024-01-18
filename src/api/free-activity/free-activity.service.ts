@@ -4,7 +4,7 @@ import { CreateFreeActivityDto } from './dto/create-free-activity.dto';
 import { UpdateFreeActivityDto } from './dto/update-free-activity.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { FreeActivity } from './entities/free-activity.entity';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
@@ -72,6 +72,54 @@ export class FreeActivityService {
       return freeActivities;
     }
     return this.fromArrSchemaToRegular(freeActivities);
+  }
+
+  async findAllRequestByAssociation(
+    associationId: string,
+  ) {
+    const freeActivities = await this.freeActivityModel.aggregate([
+      {
+        $lookup: {
+          from: 'managers',
+          localField: 'manager',
+          foreignField: '_id',
+          as: 'manager',
+        },
+      },
+      {
+        $unwind: '$manager',
+      },
+      {
+        $match: {
+          'manager.association': new mongoose.Types.ObjectId(
+            associationId,
+          ),
+        },
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'category',
+          foreignField: '_id',
+          as: 'category',
+        },
+      },
+      {
+        $unwind: '$category',
+      },
+      {
+        $lookup: {
+          from: 'volunteers',
+          localField: 'volunteer',
+          foreignField: '_id',
+          as: 'volunteer',
+        },
+      },
+      {
+        $unwind: '$volunteer',
+      },
+    ]);
+    return freeActivities;
   }
 
   async fromArrSchemaToRegular(freeActivities: any[]) {

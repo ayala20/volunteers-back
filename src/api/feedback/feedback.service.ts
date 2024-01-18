@@ -54,12 +54,6 @@ export class FeedbackService {
       },
     ]);
     return feedbacks;
-    // return feedbacks.map((feedback) => ({
-    //   feedback_id: feedback.id,
-    //   date: feedback.date,
-    //   rating: feedback.rating,
-    //   note: feedback.note,
-    // }));
   }
 
   async findFeedback(id: string) {

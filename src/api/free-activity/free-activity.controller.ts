@@ -36,6 +36,11 @@ export class FreeActivityController {
     return this.freeActivityService.findAllRequestByVolunteerAndStatus(volunteerId, statuses);
   }
 
+  @Get('/findAllRequestByAssociation/:associationId')
+  findAllRequestByAssociation(@Param('associationId') associationId: string) {
+    return this.freeActivityService.findAllRequestByAssociation(associationId);
+  }
+
   @Get(':districtId/:categoryId')
   filterFreeActivitiesByDistrictAndCategory(@Param('districtId') districtId: string, @Param('categoryId') categoryId: string) {
     return this.freeActivityService.filterFreeActivitiesByDistrictAndCategory(districtId, categoryId);
