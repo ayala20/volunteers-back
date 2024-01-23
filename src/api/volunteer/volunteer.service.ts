@@ -33,7 +33,7 @@ export class VolunteerService {
   }
 
   async signIn(idNumber: string, password: string) {
-    let volunteer;
+    let volunteer: any;
     let match: boolean;
     try {
       volunteer = await this.volunteerModel.findOne({

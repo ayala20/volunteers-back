@@ -112,6 +112,49 @@ export class FeedbackService {
     return feedbacks;
   }
 
+  async getFeedbackByManagerId(managerId: string) {
+    const feedbacks = await this.feedbackModel.aggregate([
+      {
+        $lookup: {
+          from: 'freeactivities',
+          localField: 'idFreeActivity',
+          foreignField: '_id',
+          as: 'freeActivityData',
+        },
+      },
+      {
+        $unwind: '$freeActivityData',
+      },
+      {
+        $match: {
+          'freeActivityData.manager': new mongoose.Types.ObjectId(managerId),
+        },
+      },
+      {
+        $lookup: {
+          from: 'volunteers',
+          localField: 'freeActivityData.volunteer',
+          foreignField: '_id',
+          as: 'volunteerData',
+        },
+      },
+      {
+        $unwind: '$volunteerData',
+      },
+      {
+        $project: {
+          _id: 1,
+          date: 1,
+          rating: 1,
+          note: 1,
+          freeActivityData: 1,
+          volunteerData: 1,
+        },
+      },
+    ]);
+    return feedbacks;
+  }
+
   async update(id: string, updateFeedbackDto: UpdateFeedbackDto) {
     const updatedFeedback = await this.findFeedback(id);
     if (updateFeedbackDto.date) {

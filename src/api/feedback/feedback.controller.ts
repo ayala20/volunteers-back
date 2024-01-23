@@ -36,6 +36,11 @@ export class FeedbackController {
     return this.feedbackService.getFeedbackByVolunteerId(volunteerId);
   }
 
+  @Get('/getFeedbackByManagerId/:managerId')
+  async getFeedbackByManagerId(@Param('managerId') managerId: string) {
+    return this.feedbackService.getFeedbackByManagerId(managerId);
+  }
+
   @Put(':id')
   update(
     @Param('id') id: string,
