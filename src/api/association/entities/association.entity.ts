@@ -2,11 +2,11 @@ import * as mongoose from 'mongoose';
 import { StatusAssociation } from '../dto/create-association.dto';
 
 export const AssociationSchema = new mongoose.Schema({
-  number: Number,
+  number: { type: Number, unique: true },
   name: String,
   address: String,
-  email: String,
-  phone: String,
+  email: { type: String, unique: true },
+  phone: { type: String, unique: true },
   password: String,
   file: String,
   logo_image: String,

@@ -6,19 +6,25 @@ import { Model } from 'mongoose';
 import { Volunteer } from './entities/volunteer.entity';
 import * as bcrypt from 'bcrypt';
 import { IncorrectPasswordException } from 'src/exceptions/incorrect-password-exception';
+import { DataExistsException } from 'src/exceptions/email-exists-exception';
 
 @Injectable()
 export class VolunteerService {
   constructor(
     @InjectModel('Volunteer') private volunteerModel: Model<Volunteer>,
-  ) {}
+  ) { }
 
   async create(createVolunteerDto: CreateVolunteerDto) {
     const salt = await bcrypt.genSalt();
     const hashPassword = await bcrypt.hash(createVolunteerDto.password, salt);
     createVolunteerDto.password = hashPassword;
     const newVolunteer = new this.volunteerModel(createVolunteerDto);
-    const volunteer = await newVolunteer.save();
+    let volunteer: any;
+    try {
+      volunteer = await newVolunteer.save();
+    } catch (error) {
+      throw new DataExistsException('Data is exists!');
+    }
     return {
       id: volunteer.id,
       full_name: volunteer.full_name,
@@ -64,8 +70,24 @@ export class VolunteerService {
     };
   }
 
+  async isVolunteerExistsByEmail(email: string) {
+    let volunteer: any;
+    try {
+      volunteer = await this.volunteerModel.findOne({ email });
+    } catch (error) {
+      return false;
+    }
+    if (!volunteer) {
+      return false;
+    }
+    return true;
+  }
+
   async findAll() {
-    const volunteers = await this.volunteerModel.find().exec();
+    const volunteers = await this.volunteerModel
+      .find()
+      .sort({ ['full_name']: 1 })
+      .exec();
     return volunteers.map((volunteer) => ({
       id: volunteer.id,
       full_name: volunteer.full_name,

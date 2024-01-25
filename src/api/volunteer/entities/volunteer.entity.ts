@@ -3,11 +3,11 @@ import * as mongoose from 'mongoose';
 export const VolunteerSchema = new mongoose.Schema({
   full_name: String,
   address: String,
-  phone: String,
+  phone: { type: String, unique: true },
   dateOfBirth: Date,
-  id_number: String,
+  id_number: { type: String, unique: true },
   password: String,
-  email: String,
+  email: { type: String, unique: true },
 });
 
 export interface Volunteer extends mongoose.Document {

@@ -23,7 +23,7 @@ export class AssociationController {
 
   @Post()
   create(@Body() createAssociationDto: CreateAssociationDto) {
-    return JSON.stringify(this.associationService.create(createAssociationDto));
+    return this.associationService.create(createAssociationDto);
   }
 
   @Post('uploadFile')
@@ -56,12 +56,12 @@ export class AssociationController {
     return JSON.stringify(file.filename);
   }
 
-  @Get(':status')
+  @Get('/getAllByStatus/:status')
   findAll(@Param('status') status: StatusAssociation) {
     return this.associationService.findAll(status);
   }
 
-  @Get(':id')
+  @Get('/getById/:id')
   findOne(@Param('id') id: string) {
     return this.associationService.findOne(id);
   }

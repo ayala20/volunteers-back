@@ -34,6 +34,11 @@ export class ManagerController {
     return this.managerService.findOne(id);
   }
 
+  @Get('isManagerExistsByEmail/:email')
+  isManagerExistsByEmail(@Param('email') email: string) {
+    return this.managerService.isManagerExistsByEmail(email);
+  }
+
   @Put(':id')
   update(@Param('id') id: string, @Body() updateManagerDto: UpdateManagerDto) {
     return this.managerService.update(id, updateManagerDto);

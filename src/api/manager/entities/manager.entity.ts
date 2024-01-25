@@ -4,7 +4,7 @@ export const ManagerSchema = new mongoose.Schema({
   name: String,
   password: String,
   email: { type: String, unique: true },
-  phone: String,
+  phone: { type: String, unique: true },
   association: { type: mongoose.Schema.Types.ObjectId, ref: 'Association' },
 });
 

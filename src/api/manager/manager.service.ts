@@ -9,6 +9,7 @@ import * as dotenv from 'dotenv';
 import * as bcrypt from 'bcrypt';
 import { IncorrectPasswordException } from 'src/exceptions/incorrect-password-exception';
 import { AssociationService } from '../association/association.service';
+import { DataExistsException } from 'src/exceptions/email-exists-exception';
 
 dotenv.config();
 
@@ -32,7 +33,7 @@ export class ManagerService {
     try {
       manager = await newManager.save();
     } catch (error) {
-      throw new NotFoundException('Email is exist!');
+      throw new DataExistsException('Data is exists!');
     }
     return {
       id: manager.id,
@@ -119,6 +120,19 @@ export class ManagerService {
       phone: manager.phone,
       branch_id: manager.branch_id,
     };
+  }
+
+  async isManagerExistsByEmail(email: string) {
+    let manager: any;
+    try {
+      manager = await this.managerModel.findOne({ email });
+    } catch (error) {
+      return false;
+    }
+    if (!manager) {
+      return false;
+    }
+    return true;
   }
 
   async update(id: string, updateManagerDto: UpdateManagerDto) {

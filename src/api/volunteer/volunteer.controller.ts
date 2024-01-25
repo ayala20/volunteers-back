@@ -38,6 +38,11 @@ export class VolunteerController {
     return this.volunteerService.signIn(idNumber, password);
   }
 
+  @Get('isVolunteerExistsByEmail/:email')
+  isVolunteerExistsByEmail(@Param('email') email: string) {
+    return this.volunteerService.isVolunteerExistsByEmail(email);
+  }
+
   @Put(':id')
   update(
     @Param('id') id: string,

@@ -10,6 +10,7 @@ import {
 } from './dto/create-association.dto';
 import * as bcrypt from 'bcrypt';
 import { MailService } from 'src/mail/mail.service';
+import { DataExistsException } from 'src/exceptions/email-exists-exception';
 
 @Injectable()
 export class AssociationService {
@@ -19,14 +20,21 @@ export class AssociationService {
   ) { }
 
   async create(createAssociationDto: CreateAssociationDto) {
+    debugger;
     const newAssociation = new this.associationModel(createAssociationDto);
-    const result = await newAssociation.save();
-    return result.id;
+    let association: any;
+    try {
+      association = await newAssociation.save();
+    } catch (error) {
+      throw new DataExistsException('Data is exists!');
+    }
+    return association;
   }
 
   async findAll(status: StatusAssociation) {
     const associations = await this.associationModel
       .find({ status: status })
+      .sort({ ['name']: 1 })
       .exec();
     return associations.map((association) => ({
       id: association.id,
