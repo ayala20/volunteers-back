@@ -10,13 +10,19 @@ import * as bcrypt from 'bcrypt';
 import { IncorrectPasswordException } from 'src/exceptions/incorrect-password-exception';
 import { AssociationService } from '../association/association.service';
 import { DataExistsException } from 'src/exceptions/email-exists-exception';
+import { CacheService } from 'src/sharedServices/cache.service';
+import { MailService } from 'src/mail/mail.service';
+import { Exception } from 'handlebars/runtime';
 
 dotenv.config();
 
 @Injectable()
 export class ManagerService {
   constructor(@InjectModel('Manager') private managerModel: Model<Manager>,
-    private readonly associationService: AssociationService) { }
+    private readonly associationService: AssociationService,
+    private readonly cacheService: CacheService,
+    private readonly mailService: MailService
+  ) { }
 
   async create(createManagerDto: CreateManagerDto) {
     const obj: any = this.associationService.findOne(createManagerDto.association);
@@ -122,6 +128,16 @@ export class ManagerService {
     };
   }
 
+  generateRandomCode(length: number): string {
+    const characters: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let code: string = '';
+    for (let i: number = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      code += characters.charAt(randomIndex);
+    }
+    return code;
+  }
+
   async isManagerExistsByEmail(email: string) {
     let manager: any;
     try {
@@ -132,7 +148,35 @@ export class ManagerService {
     if (!manager) {
       return false;
     }
+    const hashPassword = this.generateRandomCode(6);
+    this.cacheService.set(email, hashPassword);
+    this.mailService.sendingAnEmailForForgetPassword(email, hashPassword, manager.name)
     return true;
+  }
+
+  async isCodeGood(email: string, password: string) {
+    let code = "";
+    await this.cacheService.get(email)
+      .then(c => {
+        code = c
+      })
+    return code == password;
+  }
+
+  async updatePassword(email: string, password: string) {
+    const updatedManager: any = await this.managerModel.findOne({ email }).exec();
+    const salt = await bcrypt.genSalt();
+    const hashPassword = await bcrypt.hash(password, salt);
+    updatedManager.password = hashPassword;
+    let manager: any;
+    try {
+      manager = await updatedManager.save();
+    } catch (error) {
+      throw new Exception("Somsing worng!");
+    }
+    if (!manager) {
+      throw new Exception("Somsing worng!");
+    }
   }
 
   async update(id: string, updateManagerDto: UpdateManagerDto) {

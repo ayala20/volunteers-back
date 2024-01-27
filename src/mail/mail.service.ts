@@ -72,4 +72,16 @@ export class MailService {
       });
     }
   }
+
+  async sendingAnEmailForForgetPassword(email: string, password: string, name: string) {
+    await this.mailerService.sendMail({
+      to: email,
+      subject: `שלום ${name}, מצורף סיסמה לאימות`,
+      template: './codeForgetEmail.html',
+      context: {
+        name: name,
+        password: password,
+      },
+    });
+  }
 }

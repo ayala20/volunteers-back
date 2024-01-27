@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Controller,
   Get,
@@ -13,7 +14,7 @@ import { UpdateManagerDto } from './dto/update-manager.dto';
 
 @Controller('api/manager')
 export class ManagerController {
-  constructor(private readonly managerService: ManagerService) {}
+  constructor(private readonly managerService: ManagerService) { }
   @Post()
   create(@Body() createManagerDto: CreateManagerDto) {
     return this.managerService.create(createManagerDto);
@@ -27,6 +28,16 @@ export class ManagerController {
   @Get('signIn/:email/:password')
   signIn(@Param('email') email: string, @Param('password') password: string) {
     return this.managerService.signIn(email, password);
+  }
+
+  @Get('isCodeGood/:email/:password')
+  isCodeGood(@Param('email') email: string, @Param('password') password: string) {
+    return this.managerService.isCodeGood(email, password);
+  }
+
+  @Put('updatePassword/:email/:password')
+  updatePassword(@Param('email') email: string, @Param('password') password: string) {
+    return this.managerService.updatePassword(email, password);
   }
 
   @Get(':id')

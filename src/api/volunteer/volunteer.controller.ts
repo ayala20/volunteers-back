@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Controller,
   Get,
@@ -28,6 +29,11 @@ export class VolunteerController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.volunteerService.findOne(id);
+  }
+
+  @Put('updatePassword/:email/:password')
+  updatePassword(@Param('email') email: string, @Param('password') password: string) {
+    return this.volunteerService.updatePassword(email, password);
   }
 
   @Get('signIn/:idNumber/:password')

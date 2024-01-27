@@ -13,6 +13,7 @@ import { join } from 'path';
 import { FreeActivityModule } from './api/free-activity/free-activity.module';
 import { FeedbackModule } from './api/feedback/feedback.module';
 import { MailModule } from './mail/mail.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 dotenv.config();
 
@@ -20,6 +21,9 @@ dotenv.config();
   imports: [
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
+    }),
+    CacheModule.register({
+      ttl: 300000,
     }),
     MongooseModule.forRoot(process.env.MONGO_URI),
     CategoryModule,

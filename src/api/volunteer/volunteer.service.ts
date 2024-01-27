@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateVolunteerDto } from './dto/create-volunteer.dto';
 import { UpdateVolunteerDto } from './dto/update-volunteer.dto';
@@ -7,11 +8,16 @@ import { Volunteer } from './entities/volunteer.entity';
 import * as bcrypt from 'bcrypt';
 import { IncorrectPasswordException } from 'src/exceptions/incorrect-password-exception';
 import { DataExistsException } from 'src/exceptions/email-exists-exception';
+import { CacheService } from 'src/sharedServices/cache.service';
+import { MailService } from 'src/mail/mail.service';
+import { Exception } from 'handlebars';
 
 @Injectable()
 export class VolunteerService {
   constructor(
     @InjectModel('Volunteer') private volunteerModel: Model<Volunteer>,
+    private readonly cacheService: CacheService,
+    private readonly mailService: MailService
   ) { }
 
   async create(createVolunteerDto: CreateVolunteerDto) {
@@ -70,6 +76,16 @@ export class VolunteerService {
     };
   }
 
+  generateRandomCode(length: number): string {
+    const characters: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let code: string = '';
+    for (let i: number = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      code += characters.charAt(randomIndex);
+    }
+    return code;
+  }
+
   async isVolunteerExistsByEmail(email: string) {
     let volunteer: any;
     try {
@@ -80,7 +96,26 @@ export class VolunteerService {
     if (!volunteer) {
       return false;
     }
+    const hashPassword = this.generateRandomCode(6);
+    this.cacheService.set(email, hashPassword);
+    this.mailService.sendingAnEmailForForgetPassword(email, hashPassword, volunteer.full_name)
     return true;
+  }
+
+  async updatePassword(email: string, password: string) {
+    const updatedVolunteer: any = await this.volunteerModel.findOne({ email }).exec();
+    const salt = await bcrypt.genSalt();
+    const hashPassword = await bcrypt.hash(password, salt);
+    updatedVolunteer.password = hashPassword;
+    let volunteer: any;
+    try {
+      volunteer = await updatedVolunteer.save();
+    } catch (error) {
+      throw new Exception("Somsing worng!");
+    }
+    if (!volunteer) {
+      throw new Exception("Somsing worng!");
+    }
   }
 
   async findAll() {
