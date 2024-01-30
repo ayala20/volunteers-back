@@ -222,4 +222,5 @@ export class FreeActivityService {
     }
     return `This action removes a #${id} freeActivity`;
   }
+
 }

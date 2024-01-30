@@ -49,7 +49,7 @@ export class VolunteerController {
     return this.volunteerService.isVolunteerExistsByEmail(email);
   }
 
-  @Put(':id')
+  @Put('updateVolunteer/:id')
   update(
     @Param('id') id: string,
     @Body() updateVolunteerDto: UpdateVolunteerDto,

@@ -164,26 +164,32 @@ export class VolunteerService {
 
   async update(id: string, updateVolunteerDto: UpdateVolunteerDto) {
     const updatedVolunteer = await this.findVolunteer(id);
-    if (updateVolunteerDto.full_name) {
-      updatedVolunteer.full_name = updateVolunteerDto.full_name;
-    }
     if (updateVolunteerDto.address) {
       updatedVolunteer.address = updateVolunteerDto.address;
     }
     if (updateVolunteerDto.phone) {
       updatedVolunteer.phone = updateVolunteerDto.phone;
     }
-    if (updateVolunteerDto.dateOfBirth) {
-      updatedVolunteer.dateOfBirth = updateVolunteerDto.dateOfBirth;
+    if (updateVolunteerDto.email) {
+      updatedVolunteer.email = updateVolunteerDto.email;
     }
-    if (updateVolunteerDto.id_number) {
-      updatedVolunteer.id_number = updateVolunteerDto.id_number;
+    let volunteer: any;
+    try {
+      volunteer = await updatedVolunteer.save();
+    } catch (error) {
+      throw new DataExistsException('Data is exists!');
     }
-    if (updateVolunteerDto.password) {
-      updatedVolunteer.passwword = updateVolunteerDto.password;
-    }
-    await updatedVolunteer.save();
-    return `This action updates a #${id} volunteer`;
+    return {
+      id: volunteer.id,
+      full_name: volunteer.full_name,
+      address: volunteer.address,
+      phone: volunteer.phone,
+      dateOfBirth: volunteer.dateOfBirth,
+      id_number: volunteer.id_number,
+      password: volunteer.password,
+      email: volunteer.email,
+      roleUser: 1,
+    };
   }
 
   async remove(id: string) {

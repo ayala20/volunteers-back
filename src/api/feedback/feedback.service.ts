@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
@@ -10,7 +11,7 @@ import { InjectModel } from '@nestjs/mongoose';
 export class FeedbackService {
   constructor(
     @InjectModel('Feedback') private feedbackModel: Model<Feedback>,
-  ) {}
+  ) { }
 
   async create(createFeedbackDto: CreateFeedbackDto) {
     const newFeedback = new this.feedbackModel(createFeedbackDto);
@@ -25,33 +26,48 @@ export class FeedbackService {
           from: 'freeactivities',
           localField: 'idFreeActivity',
           foreignField: '_id',
-          as: 'freeActivityData',
+          as: 'idFreeActivity',
         },
       },
       {
-        $unwind: '$freeActivityData',
+        $unwind: '$idFreeActivity',
+      },
+      {
+        $lookup: {
+          from: 'managers',
+          localField: 'idFreeActivity.manager',
+          foreignField: '_id',
+          as: 'manager'
+        }
+      },
+      {
+        $unwind: '$manager'
+      },
+      {
+        $lookup: {
+          from: 'associations',
+          localField: 'manager.association',
+          foreignField: '_id',
+          as: 'association'
+        }
+      },
+      {
+        $unwind: '$association'
       },
       {
         $lookup: {
           from: 'volunteers',
-          localField: 'freeActivityData.volunteer',
+          localField: 'idFreeActivity.volunteer',
           foreignField: '_id',
-          as: 'volunteerData',
-        },
+          as: 'volunteer'
+        }
       },
       {
-        $unwind: '$volunteerData',
+        $unwind: '$volunteer'
       },
       {
-        $project: {
-          _id: 1,
-          date: 1,
-          rating: 1,
-          note: 1,
-          freeActivityData: 1,
-          volunteerData: 1,
-        },
-      },
+        $sort: { date: -1 }
+      }
     ]);
     return feedbacks;
   }
@@ -86,28 +102,53 @@ export class FeedbackService {
           from: 'freeactivities',
           localField: 'idFreeActivity',
           foreignField: '_id',
-          as: 'freeActivityData',
+          as: 'idFreeActivity',
         },
       },
       {
-        $unwind: '$freeActivityData',
+        $unwind: '$idFreeActivity',
       },
       {
         $match: {
-          'freeActivityData.volunteer': new mongoose.Types.ObjectId(
-            volunteerId,
-          ),
+          'idFreeActivity.volunteer': new mongoose.Types.ObjectId(volunteerId),
         },
       },
       {
-        $project: {
-          _id: 1,
-          date: 1,
-          rating: 1,
-          note: 1,
-          freeActivityData: 1,
-        },
+        $lookup: {
+          from: 'managers',
+          localField: 'idFreeActivity.manager',
+          foreignField: '_id',
+          as: 'manager'
+        }
       },
+      {
+        $unwind: '$manager'
+      },
+      {
+        $lookup: {
+          from: 'associations',
+          localField: 'manager.association',
+          foreignField: '_id',
+          as: 'association'
+        }
+      },
+      {
+        $unwind: '$association'
+      },
+      {
+        $lookup: {
+          from: 'volunteers',
+          localField: 'idFreeActivity.volunteer',
+          foreignField: '_id',
+          as: 'volunteer'
+        }
+      },
+      {
+        $unwind: '$volunteer'
+      },
+      {
+        $sort: { date: -1 }
+      }
     ]);
     return feedbacks;
   }
@@ -119,38 +160,53 @@ export class FeedbackService {
           from: 'freeactivities',
           localField: 'idFreeActivity',
           foreignField: '_id',
-          as: 'freeActivityData',
+          as: 'idFreeActivity',
         },
       },
       {
-        $unwind: '$freeActivityData',
+        $unwind: '$idFreeActivity',
       },
       {
         $match: {
-          'freeActivityData.manager': new mongoose.Types.ObjectId(managerId),
+          'idFreeActivity.manager': new mongoose.Types.ObjectId(managerId),
         },
       },
       {
         $lookup: {
-          from: 'volunteers',
-          localField: 'freeActivityData.volunteer',
+          from: 'managers',
+          localField: 'idFreeActivity.manager',
           foreignField: '_id',
-          as: 'volunteerData',
-        },
+          as: 'manager'
+        }
       },
       {
-        $unwind: '$volunteerData',
+        $unwind: '$manager'
       },
       {
-        $project: {
-          _id: 1,
-          date: 1,
-          rating: 1,
-          note: 1,
-          freeActivityData: 1,
-          volunteerData: 1,
-        },
+        $lookup: {
+          from: 'associations',
+          localField: 'manager.association',
+          foreignField: '_id',
+          as: 'association'
+        }
       },
+      {
+        $unwind: '$association'
+      },
+      {
+        $lookup: {
+          from: 'volunteers',
+          localField: 'idFreeActivity.volunteer',
+          foreignField: '_id',
+          as: 'volunteer'
+        }
+      },
+      {
+        $unwind: '$volunteer'
+      },
+      {
+        $sort: { date: -1 }
+      }
     ]);
     return feedbacks;
   }

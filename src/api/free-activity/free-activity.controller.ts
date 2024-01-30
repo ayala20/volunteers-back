@@ -64,7 +64,6 @@ export class FreeActivityController {
     @Param('freeActivityId') freeActivityId: string,
     @Param('userId') userId: string,
     @Param('status') status: string,
-
   ) {
     return JSON.stringify(this.freeActivityService.updateStatus(freeActivityId, userId, status));
   }

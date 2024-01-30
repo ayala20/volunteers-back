@@ -96,10 +96,10 @@ export class ManagerService {
     return {
       id: manager.id,
       name: manager.name,
-      user_name: manager.user_name,
       password: manager.password,
+      email: manager.email,
       phone: manager.phone,
-      branch_id: manager.branch_id,
+      association: manager.association,
       roleUser: 2,
     };
   }
@@ -181,20 +181,27 @@ export class ManagerService {
 
   async update(id: string, updateManagerDto: UpdateManagerDto) {
     const updatedManager = await this.findManager(id);
-    if (updateManagerDto.name) {
-      updatedManager.name = updateManagerDto.name;
-    }
-    if (updateManagerDto.password) {
-      updatedManager.password = updateManagerDto.password;
-    }
     if (updateManagerDto.email) {
       updatedManager.email = updateManagerDto.email;
     }
     if (updateManagerDto.phone) {
       updatedManager.phone = updateManagerDto.phone;
     }
-    await updatedManager.save();
-    return `This action updates a #${id} manager`;
+    let manager: any;
+    try {
+      manager = await updatedManager.save();
+    } catch (error) {
+      throw new DataExistsException('Data is exists!');
+    }
+    return {
+      id: manager.id,
+      name: manager.name,
+      password: manager.password,
+      email: manager.email,
+      phone: manager.phone,
+      association: manager.association,
+      roleUser: 2,
+    };
   }
 
   async remove(id: string) {

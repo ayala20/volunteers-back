@@ -50,7 +50,7 @@ export class ManagerController {
     return this.managerService.isManagerExistsByEmail(email);
   }
 
-  @Put(':id')
+  @Put('updateManager/:id')
   update(@Param('id') id: string, @Body() updateManagerDto: UpdateManagerDto) {
     return this.managerService.update(id, updateManagerDto);
   }

@@ -1,4 +1,8 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateVolunteerDto } from './create-volunteer.dto';
-
-export class UpdateVolunteerDto extends PartialType(CreateVolunteerDto) {}
+/* eslint-disable prettier/prettier */
+export class UpdateVolunteerDto {
+    constructor(
+        public address: string,
+        public phone: string,
+        public email: string,
+  ) {}
+}

@@ -1,4 +1,7 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateManagerDto } from './create-manager.dto';
-
-export class UpdateManagerDto extends PartialType(CreateManagerDto) {}
+/* eslint-disable prettier/prettier */
+export class UpdateManagerDto {
+    constructor(
+        public phone: string,
+        public email: string,
+    ) { }
+}
