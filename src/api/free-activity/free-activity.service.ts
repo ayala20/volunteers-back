@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateFreeActivityDto } from './dto/create-free-activity.dto';
@@ -137,15 +138,17 @@ export class FreeActivityService {
     }));
   }
 
-  async filterFreeActivitiesByDistrictAndCategory(districtId: string, categoryId: string) {
+  async filterFreeActivitiesByDistrictAndCategory(districtIds: string, categoryIds: string) {
+    const districtIdsArr = districtIds.split(',');
+    const categoryIdsArr = categoryIds.split(',');
     let objd, objc;
-    if (districtId != '1') {
-      objd = { district: districtId };
+    if (districtIdsArr[0] != '1') {
+      objd = { district: { $in: districtIdsArr } };
     }
-    if (categoryId != '1') {
-      objc = { category: categoryId };
+    if (categoryIdsArr[0] != '1') {
+      objc = { category: { $in: categoryIdsArr } };
     }
-    const object = { ...objd, ...objc, status: 'WAITING' };
+    const object = { ...objd, ...objc, status: 'WAITING', dateAndTime: { $gt: new Date() }};
     const freeActivities = await this.freeActivityModel
       .find(object)
       .populate({ path: 'district' })
