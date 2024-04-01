@@ -67,7 +67,7 @@ export class MailService {
           name: name,
           nameA: nameA,
           message: "לא אושרה",
-          m1: "ממליצים לבדוק אולי יש התנדבויות אחרו שיכולות להתאים לך",
+          m1: "מציעים לך לבדוק אולי יש התנדבויות אחרות שיוכלו להתאים לך :)",
         },
       });
     }
@@ -76,7 +76,7 @@ export class MailService {
   async sendingAnEmailForForgetPassword(email: string, password: string, name: string) {
     await this.mailerService.sendMail({
       to: email,
-      subject: `שלום ${name}, מצורף סיסמה לאימות`,
+      subject: `שלום ${name}, מצורפת סיסמה לאימות`,
       template: './codeForgetEmail.html',
       context: {
         name: name,
