@@ -19,7 +19,7 @@ import { diskStorage } from 'multer';
 @Controller('api/association')
 export class AssociationController {
   private createAssociationDto: CreateAssociationDto;
-  constructor(private readonly associationService: AssociationService) {}
+  constructor(private readonly associationService: AssociationService) { }
 
   @Post()
   create(@Body() createAssociationDto: CreateAssociationDto) {
